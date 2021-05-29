@@ -1,0 +1,42 @@
+opendeps: "0.1.0"
+
+info:
+  title: Sample Petstore app dependencies
+  description: This is a sample specification declaring the dependencies of an example Petstore app.
+  contact:
+    name: Pete Cornish
+    url: https://github.com/opendeps
+    email: outofcoffee@gmail.com
+  version: "1.0.1"
+
+  # the URL to this file
+  manifest: https://raw.githubusercontent.com/opendeps/specification/main/examples/petstore/.well-known/opendeps/manifest.yaml
+
+dependencies:
+  pet_name_service:
+    summary: The pet naming service.
+    description: The service generates pet names.
+    spec: ./pet_name_service_openapi.yaml
+    version: "2.0.0"
+    availability:
+      url: https://example.com/pet-names
+
+  order_service:
+    summary: The order service.
+    description: The service allows ordering of pet supplies from the store.
+    spec: https://raw.githubusercontent.com/opendeps/specification/main/examples/petstore/order_service_openapi.yaml
+    version: "1.0.0"
+    required: true
+    availability:
+      url: https://example.com/orders
+      intervalSeconds: 10
+      timeoutSeconds: 5
+      attempts: 3
+      security:
+        - BasicAuth: []
+
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
