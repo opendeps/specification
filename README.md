@@ -3,10 +3,10 @@
 The OpenDeps specification allows you to express your application's _external_ runtime dependencies. This allows you to clearly communicate the required versions of your dependencies. This has many benefits in software quality and deployment automation to help you move faster, safely.
 
 Benefits:
-- Human readable and machine readable; language agnostic
-- Tooling can verify your dependencies are in place before deploying your app
+- Verify your dependencies are in place before deploying your app
 - Rapidly spin up live mocks of all your app's dependencies so you can build/test your app quickly
 - Integrates with the [OpenAPI specification](https://github.com/OAI/OpenAPI-Specification)
+- Human readable and machine readable; language agnostic
 - Comprehensible by developers and non-developers
 
 ```yaml
@@ -51,12 +51,14 @@ Dependencies can have metadata to ensure a more specific match to your app's req
 
 The types of metadata are as follows:
 
-- OpenAPI spec: each service can provide an API specification using the OpenAPI standard. This provides information about the dependency, such as its version and endpoints ('servers' in OpenAPI 3.x).
-- 
+- OpenAPI spec: each dependency can provide an API specification using the OpenAPI standard. This provides information about the dependency, such as its version and endpoints ('servers' in OpenAPI 3.x).
+- Inline metadata: each dependency can specify the required version, which can be validated against its specification, to ensure that the right version is deployed
 
 ## Why is this different from npm/Maven/Gradle/godep etc.?
 
-OpenDeps is for expressing your external runtime dependencies, rather than things needed to build or package your application. An OpenDeps specification is intended to be shipped alongside your application, so that at deployment time, you can verify that your required dependencies exist. This can save you from deploying your application into an environment in which it will not work, saving your users from service outages.
+OpenDeps is for expressing your external runtime dependencies, rather than things needed to build or package your application.
+
+An OpenDeps specification is intended to be shipped alongside your application, so that at deployment time, you can verify that your required dependencies exist. This can save you from deploying your application into an environment in which it will not work, saving your users from service outages.
 
 Another benefit OpenDeps provides is during local development - rapidly improving the speed of the 'inner loop' of test-build on your local enviroment. Tools understand that your application needs certain APIs to work, so they can stand up live working mock endpoints of these APIs based on their OpenAPI specs.
 
@@ -66,7 +68,7 @@ You are building your application and would like to test it. With a command, all
 
 With your app's dependencies running, you can now interactively test your application against local mocks, saving you deployment effort and providing a much faster feedback loop.
 
-This is possible because tools like [Imposter](https://github.com/outofcoffee/imposter/) can understand your app's dependencies and download their OpenAPI specifications to automatically create live mocks of those dependencies.
+This is possible because tools like [Imposter](https://github.com/outofcoffee/imposter/) can understand your app's dependencies, fetch their OpenAPI specifications, and automatically create live mocks of those dependencies.
 
 You can mark which dependencies are required in your OpenDeps specification:
 
@@ -92,9 +94,9 @@ Non-required dependencies ('optional dependencies') are those without which your
 
 You have built and tested your application and it has reached the deployment stage of your CI/CD pipeline. Just before you trigger your deployment operation, your tools spot that one of the application's _required_ dependencies is not yet deployed.
 
-Perhaps your dependency hasn't been deployed yet, or is the wrong version, or maybe it is not reachable from your application's environment. You can choose to fail fast to avoid causing a service outage for your users.
+Perhaps your dependency hasn't been deployed yet, or is the wrong version, or maybe it is not reachable from your application's environment. Your deployment can fail fast to avoid causing a service outage for your users.
 
-This was possible because tooling can parse the dependencies marked with `required: true` and verify their availability using the `availability.url` value.
+This is possible because tooling can parse the dependencies marked with `required: true` and verify their availability using the `availability.url` value.
 
 You can customise the values used to check for availability, or use the defaults:
 
@@ -107,7 +109,7 @@ availability:
   attempts: 3
 ```
 
-You can customise the security requirements for accessing the availability URL:
+If your availability endpoint requires it, you can customise the security requirements for accessing it:
 
 ```yaml
 availability:
