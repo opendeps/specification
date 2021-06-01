@@ -1,13 +1,17 @@
 # The Open Dependencies project (OpenDeps)
 
-The OpenDeps specification allows you to express your application's _external_ runtime dependencies. This allows you to clearly communicate the required versions of your dependencies. This has many benefits in software quality and deployment automation to help you move faster, safely.
+OpenDeps allows you to express your application's _external runtime dependencies_. Clearly communicate what your software component needs to operate and run correctly.
+
+Your application requires specific versions of external APIs and other resources. Formalising these dependencies helps improve software quality (e.g. earlier integration testing) and operations (e.g. deployment automation) to help you move faster, safely.
 
 Benefits:
-- Verify your dependencies are in place before deploying your app
+- Verify dependencies are in place before deploying your app
 - Rapidly spin up live mocks of all your app's dependencies so you can build/test your app quickly
 - Integrates with the [OpenAPI specification](https://github.com/OAI/OpenAPI-Specification)
-- Human readable and machine readable; language agnostic
-- Comprehensible by developers and non-developers
+- Language agnostic and cross-platform
+- Human readable and machine readable; comprehensible by developers and non-developers
+
+Here is an example:
 
 ```yaml
 opendeps: "0.1.0"
@@ -39,32 +43,24 @@ dependencies:
       attempts: 3
 ```
 
-In this example our app, a Petstore, depends on two external services. Each service's specification is a regular [OpenAPI specification](https://github.com/OAI/OpenAPI-Specification).
+Some things to note about this example:
 
-For example, our app requires version `2.0.0` of the `pet_name_service` to be present. The `pet_name_service` has an availability URL that should respond with `HTTP 200 OK` to indicate it is available.
-
-Our app also requires version `1.0.0` of `order_service`. This dependency is marked as `required: true` which means that it being unreachable must be considered a failure. I
-
-### Metadata
-
-Dependencies can have metadata to ensure a more specific match to your app's requirements.
-
-The types of metadata are as follows:
-
-- OpenAPI spec: each dependency can provide an API specification using the OpenAPI standard. This provides information about the dependency, such as its version and endpoints ('servers' in OpenAPI 3.x).
-- Inline metadata: each dependency can specify the required version, which can be validated against its specification, to ensure that the right version is deployed
+- Our Petstore app depends on two external services: `pet_name_service` and `order_service`. Each service is defined by a regular [OpenAPI specification](https://github.com/OAI/OpenAPI-Specification).
+- The services expose an *availability URL* that must respond with an `HTTP 2xx` status to indicate they are up. This lets us test for the successful existence of these dependencies, such at deploy time or for operational health monitoring.
+- Our app requires version `2.0.0` of the `pet_name_service` to be present and version `1.0.0` of `order_service`. Tools can validate the OpenDeps requirement against the OpenAPI spec.
+- The `order_service` dependency is marked as `required: true` which means that it being unreachable is considered a failure, unlike the `pet_name_service`.
 
 ## Why is this different from npm/Maven/Gradle/godep etc.?
 
 OpenDeps is for expressing your external runtime dependencies, rather than things needed to build or package your application.
 
-An OpenDeps specification is intended to be shipped alongside your application, so that at deployment time, you can verify that your required dependencies exist. This can save you from deploying your application into an environment in which it will not work, saving your users from service outages.
+You can ship an OpenDeps specification alongside your application, so that at deployment time, you can verify that your required dependencies exist. This can save you from deploying your application into an environment in which it will not work, saving your users from service outages.
 
-Another benefit OpenDeps provides is during local development - rapidly improving the speed of the 'inner loop' of test-build on your local enviroment. Tools understand that your application needs certain APIs to work, so they can stand up live working mock endpoints of these APIs based on their OpenAPI specs.
+During development OpenDeps helps you improve the speed of the 'inner loop' of test-build on your local environment. Tools can stand up live working mock endpoints of your API dependencies based on their OpenAPI specs, because OpenDeps expresses what your application needs to run properly.
 
 ## Use case 1: Local development
 
-You are building your application and would like to test it. With a command, all your application's dependencies are running, in mock form, on your local machine.
+You are building your application and would like to test it. Like many applications, yours depends on third party APIs for various services. With a single command, all your application's dependencies are running, in mock form, on your local machine.
 
 With your app's dependencies running, you can now interactively test your application against local mocks, saving you deployment effort and providing a much faster feedback loop.
 
@@ -92,11 +88,11 @@ Non-required dependencies ('optional dependencies') are those without which your
 
 ## Use case 2: Deployment
 
-You have built and tested your application and it has reached the deployment stage of your CI/CD pipeline. Just before you trigger your deployment operation, your tools spot that one of the application's _required_ dependencies is not yet deployed.
+You have built and tested your application and it has reached the deployment stage of your CI/CD pipeline. Just before you trigger your deployment operation, your tools spot that one of the application's _required_ dependencies is not available.
 
-Perhaps your dependency hasn't been deployed yet, or is the wrong version, or maybe it is not reachable from your application's environment. Your deployment can fail fast to avoid causing a service outage for your users.
+Perhaps another team has not deployed the version you require yet, or maybe the third party endpoint is not reachable from your application's environment. Your deployment can fail fast, avoiding causing a service outage for your users.
 
-This is possible because tooling can parse the dependencies marked with `required: true` and verify their availability using the `availability.url` value.
+This is possible because tooling parse the dependencies marked with `required: true` and verify their availability using the `availability.url` value.
 
 You can customise the values used to check for availability, or use the defaults:
 
@@ -109,25 +105,47 @@ availability:
   attempts: 3
 ```
 
-If your availability endpoint requires it, you can customise the security requirements for accessing it:
+### Availability probe security
+
+If your availability endpoint requires it, you can customise the security configuration:
 
 ```yaml
 availability:
   url: https://example.com/orders
-  security:
-    - BasicAuth: []
+  security: basicAuth
 ```
 
-The security schemes are defined in the `components.securitySchemes` block:
+The security configurations are defined in the `components.securityConfigs` block:
 
 ```yaml
 components:
-  securitySchemes:
-    BasicAuth:
-      type: http
+  securityConfigs:
+    basicAuth:
+      type: authHeader
       scheme: basic
-
 ```
+
+> This example describes the following HTTP request header:
+> ```Authorization: Basic base64(<username:password>)```
+
+Other supported security configurations include Bearer token and custom HTTP headers.
+
+You do not store secrets or tokens within the OpenDeps file - these are provided by the tooling.
+
+---
+
+## The specification
+
+The [OpenDeps specification](./opendeps-specification.json) is defined in JSON Schema.
+
+### Examples
+
+See the `examples` directory for sample OpenDeps files, including:
+
+- [Petstore - multiple dependencies](./examples/petstore/opendeps.yaml)
+- [Authentication - various types](./examples/authentication/opendeps.yaml)
+
+---
 
 ## Self-hosting OpenDeps files in your app
 
@@ -144,6 +162,15 @@ For example:
     https://example.com/petstore/.well-known/opendeps/manifest.yaml
 
 Tools use this well known path to obtain the OpenDeps manifest for your app, enabling automation of operations tasks such as monitoring.
+
+### Metadata
+
+Dependencies have metadata to ensure a more specific match to your app's requirements.
+
+The types of metadata are as follows:
+
+- OpenAPI spec: each dependency can provide an API specification using the OpenAPI standard. This provides information about the dependency, such as its version and endpoints ('servers' in OpenAPI 3.x).
+- Inline metadata: each dependency can specify the required version, which can be validated against its specification, to ensure that the right version is deployed
 
 ## Contributing
 

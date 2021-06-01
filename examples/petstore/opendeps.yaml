@@ -6,7 +6,7 @@ info:
   contact:
     name: Pete Cornish
     url: https://github.com/opendeps
-    email: outofcoffee@gmail.com
+    email: opendeps@example.com
   version: "1.0.1"
 
   # the URL to this file
@@ -32,11 +32,10 @@ dependencies:
       intervalSeconds: 10
       timeoutSeconds: 5
       attempts: 3
-      security:
-        - BasicAuth: []
+      security: basicAuth
 
 components:
-  securitySchemes:
-    BasicAuth:
-      type: http
+  securityConfigs:
+    basicAuth:
+      type: authHeader
       scheme: basic

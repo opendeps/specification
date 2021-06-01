@@ -1,0 +1,73 @@
+opendeps: "0.1.0"
+
+info:
+  title: Sample Petstore app dependencies
+  description: This is a sample showing various ways to authenticate an availability endpoint.
+  contact:
+    name: Pete Cornish
+    url: https://github.com/opendeps
+    email: opendeps@example.com
+  version: "1.0.0"
+
+dependencies:
+  pet_name_service_basic:
+    summary: The pet naming service protected by Basic Auth.
+    description: The service generates pet names.
+    spec: ./pet_name_service_openapi.yaml
+    version: "2.0.0"
+    availability:
+      url: https://example.com/pet-names
+      security: myBasicAuth
+
+  pet_name_service_bearer:
+    summary: The pet naming service protected by bearer token in the HTTP Authorization request header.
+    description: The service generates pet names.
+    spec: ./pet_name_service_openapi.yaml
+    version: "2.0.0"
+    availability:
+      url: https://example.com/pet-names
+      security: myBearerToken
+
+  pet_name_service_plain:
+    summary: The pet naming service protected by a plain token in the HTTP Authorization request header.
+    description: The service generates pet names.
+    spec: ./pet_name_service_openapi.yaml
+    version: "2.0.0"
+    availability:
+      url: https://example.com/pet-names
+      security: myPlainToken
+
+  pet_name_service_header:
+    summary: The pet naming service protected by custom header authentication.
+    description: The service generates pet names.
+    spec: ./pet_name_service_openapi.yaml
+    version: "2.0.0"
+    availability:
+      url: https://example.com/pet-names
+      security: myHeaderAuth
+
+components:
+  securityConfigs:
+    # Sends HTTP request header
+    #   Authorization: Basic base64(<username:password>)
+    myBasicAuth:
+      type: authHeader
+      scheme: basic
+
+    # Sends HTTP request header
+    #   Authorization: Bearer <secret>
+    myBearerToken:
+      type: authHeader
+      scheme: bearer
+
+    # Sends HTTP request header
+    #   Authorization: <secret>
+    myPlainToken:
+      type: authHeader
+      scheme: none
+
+    # Sends HTTP request header
+    #   X-Custom-Auth: <secret>
+    myHeaderAuth:
+      type: httpHeader
+      headers: [ "X-Custom-Auth" ]

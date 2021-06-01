@@ -9,7 +9,7 @@ info:
   contact:
     name: Pete Cornish
     url: https://github.com/opendeps
-    email: outofcoffee@gmail.com
+    email: opendeps@example.com
   version: "1.0.0"
 
 paths:

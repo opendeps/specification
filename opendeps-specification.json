@@ -1,0 +1,286 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opendeps.org/draft/2021-06/schema.json",
+  "title": "Open Dependencies Project Schema",
+  "description": "JSON Schema for the OpenDeps project",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "opendeps",
+    "info"
+  ],
+  "properties": {
+    "opendeps": {
+      "type": "string",
+      "description": "The version of the OpenDeps schema used by this specification.",
+      "examples": [
+        "0.1.0"
+      ]
+    },
+    "info": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "version"
+      ],
+      "description": "Information about this specification.",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The human readable title.",
+          "examples": [
+            "Example Petstore app"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "The human readable description.",
+          "examples": [
+            "Example OpenDeps specification for Petstore app"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+          "description": "The SemVer formatted version of this specification.",
+          "examples": [
+            "1.0.0"
+          ]
+        },
+        "manifest": {
+          "type": "string",
+          "format": "uri",
+          "description": "The URL to this file.",
+          "examples": [
+            "https://example.com/.well-known/opendeps/manifest.yaml"
+          ]
+        },
+        "contact": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Contact information for this specification.",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The contact name.",
+              "examples": [
+                "Ada Lovelace"
+              ]
+            },
+            "url": {
+              "type": "string",
+              "format": "uri",
+              "description": "The contact URL.",
+              "examples": [
+                "https://github.com/opendeps"
+              ]
+            },
+            "email": {
+              "type": "string",
+              "format": "email",
+              "description": "The contact email address.",
+              "examples": [
+                "opendeps@example.com"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Zero or more dependencies.",
+      "patternProperties": {
+        ".*": {
+          "$ref": "#/definitions/dependency"
+        }
+      }
+    },
+    "components": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Shared components used in this specification.",
+      "properties": {
+        "securityConfigs": {
+          "$ref": "#/definitions/securityConfigs"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A dependency.",
+      "required": [
+        "summary",
+        "version"
+      ],
+      "properties": {
+        "summary": {
+          "type": "string",
+          "description": "The summary of the dependency.",
+          "examples": [
+            "The order service."
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the dependency.",
+          "examples": [
+            "The service allows ordering of pet supplies from the store."
+          ]
+        },
+        "spec": {
+          "type": "string",
+          "format": "uri",
+          "description": "The URL for the OpenAPI specification.",
+          "examples": [
+            "https://example.com/openapi/order_service_openapi.yaml",
+            "./order_service_openapi.yaml"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+          "description": "The SemVer formatted version of the dependency. This should match the version of the OpenAPI specification identified by the spec property.",
+          "examples": [
+            "1.0.0"
+          ]
+        },
+        "required": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this dependency is required."
+        },
+        "availability": {
+          "$ref": "#/definitions/availability"
+        }
+      }
+    },
+    "availability": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "How to probe the availability of the dependency.",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "The URL to probe dependency availability.",
+          "examples": [
+            "https://example.com/pet-names"
+          ]
+        },
+        "intervalSeconds": {
+          "type": "number",
+          "format": "integer",
+          "default": 10,
+          "minimum": 1,
+          "description": "The number of seconds between availability probes."
+        },
+        "timeoutSeconds": {
+          "type": "number",
+          "format": "integer",
+          "default": 5,
+          "minimum": 1,
+          "description": "The number of seconds after which the probe times out."
+        },
+        "attempts": {
+          "type": "number",
+          "format": "integer",
+          "default": 3,
+          "minimum": 1,
+          "description": "The number of probes to attempt before the dependency is considered unavailable."
+        },
+        "security": {
+          "type": "string",
+          "description": "The name of the security configuration, from the securityConfigs block.",
+          "examples": [
+            "httpBasic"
+          ]
+        }
+      }
+    },
+    "securityConfigs": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Zero or more security configurations.",
+      "patternProperties": {
+        ".*": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/authHeaderSecurityConfig"
+            },
+            {
+              "$ref": "#/definitions/customHeaderSecurityConfig"
+            }
+          ]
+        }
+      }
+    },
+    "authHeaderSecurityConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Authentication is provided by the HTTP Authorization header.",
+      "required": [
+        "type",
+        "scheme"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "authHeader",
+          "description": "The type of authentication required for the availability probe."
+        },
+        "scheme": {
+          "type": "string",
+          "enum": [
+            "none",
+            "basic",
+            "bearer"
+          ],
+          "description": "The HTTP Authorization scheme to use: HTTP Basic, Bearer token or plain."
+        }
+      }
+    },
+    "customHeaderSecurityConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Authentication provided by one or more custom HTTP request headers.",
+      "required": [
+        "type",
+        "headers"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "httpHeader",
+          "description": "The type of authentication required for the availability probe."
+        },
+        "headers": {
+          "type": "array",
+          "minItems": 1,
+          "description": "One or more HTTP request header names.",
+          "items": {
+            "$ref": "#/definitions/customHeaderSecurityConfig/definitions/httpHeader"
+          }
+        }
+      },
+      "definitions": {
+        "httpHeader": {
+          "description": "Authentication provided an HTTP request header",
+          "type": "string",
+          "minLength": 1,
+          "examples": [
+            "X-Custom-Auth"
+          ]
+        }
+      }
+    }
+  }
+}
