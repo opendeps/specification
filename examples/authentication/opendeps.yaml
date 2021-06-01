@@ -1,8 +1,8 @@
 opendeps: "0.1.0"
 
 info:
-  title: Sample Petstore app dependencies
-  description: This is a sample showing various ways to authenticate an availability endpoint.
+  title: Sample Petstore app
+  description: Shows various ways to authenticate to an availability endpoint.
   contact:
     name: Pete Cornish
     url: https://github.com/opendeps

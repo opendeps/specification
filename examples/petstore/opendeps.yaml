@@ -1,8 +1,8 @@
 opendeps: "0.1.0"
 
 info:
-  title: Sample Petstore app dependencies
-  description: This is a sample specification declaring the dependencies of an example Petstore app.
+  title: Sample Petstore app
+  description: Declares the dependencies of an example Petstore app.
   contact:
     name: Pete Cornish
     url: https://github.com/opendeps
@@ -10,29 +10,43 @@ info:
   version: "1.0.1"
 
   # the URL to this file
-  manifest: https://raw.githubusercontent.com/opendeps/specification/main/examples/petstore/.well-known/opendeps/manifest.yaml
+  manifest: https://raw.githubusercontent.com/opendeps/specification/main/examples/petstore/opendeps.yaml
 
 dependencies:
-  pet_name_service:
-    summary: The pet naming service.
-    description: The service generates pet names.
-    spec: ./pet_name_service_openapi.yaml
-    version: "2.0.0"
-    availability:
-      url: https://example.com/pet-names
-
+  # We depend on version 2.0.0 of the order service.
+  # In development, we get an instant live mock of the service using its OpenAPI spec.
+  # At deployment time, we check it is available before deploying our app.
   order_service:
     summary: The order service.
     description: The service allows ordering of pet supplies from the store.
+    # The OpenAPI specification for the order service.
     spec: https://raw.githubusercontent.com/opendeps/specification/main/examples/petstore/order_service_openapi.yaml
-    version: "1.0.0"
+    # This version must be deployed for our app to work.
+    version: "2.0.0"
+    # It's a required dependency at runtime.
     required: true
+    # How to probe order service availability.
     availability:
-      url: https://example.com/orders
+      url: https://example.com/orders/healthz
+      security: basicAuth
+
+  # We also use the pet name service, but it is not essential,
+  # so it's not marked as 'required' here.
+  #
+  # We can still get a live mock of the service during development/testing,
+  # but if the service is not available at deployment time, just log a warning.
+  pet_name_service:
+    summary: The pet names service.
+    description: The service generates pet names.
+    # Our OpenAPI spec is relative to the OpenDeps file.
+    spec: ./pet_name_service_openapi.yaml
+    version: "1.0.0"
+    # This block controls how we probe to see if the service is up.
+    availability:
+      url: https://example.com/pet-names/healthz
       intervalSeconds: 10
       timeoutSeconds: 5
       attempts: 3
-      security: basicAuth
 
 components:
   securityConfigs:
