@@ -31,3 +31,15 @@ paths:
                       "Fluffy",
                       "Paws"
                     ]
+  /healthz:
+    get:
+      responses:
+        '200':
+          description: Healthcheck endpoint
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                success:
+                  value: "ok"

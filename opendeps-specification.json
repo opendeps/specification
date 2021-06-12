@@ -135,7 +135,14 @@
         },
         "spec": {
           "type": "string",
-          "format": "uri",
+          "oneOf": [
+            {
+              "format": "uri"
+            },
+            {
+              "pattern": "^\\./.+"
+            }
+          ],
           "description": "The URL for the OpenAPI specification.",
           "examples": [
             "https://example.com/openapi/order_service_openapi.yaml",
@@ -164,8 +171,17 @@
       "type": "object",
       "additionalProperties": false,
       "description": "How to probe the availability of the dependency.",
-      "required": [
-        "url"
+      "oneOf": [
+        {
+          "required": [
+            "url"
+          ]
+        },
+        {
+          "required": [
+            "path"
+          ]
+        }
       ],
       "properties": {
         "url": {
@@ -173,7 +189,14 @@
           "format": "uri",
           "description": "The URL to probe dependency availability.",
           "examples": [
-            "https://example.com/pet-names"
+            "https://example.com/healthz"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "description": "The path to probe dependency availability.",
+          "examples": [
+            "/healthz"
           ]
         },
         "intervalSeconds": {

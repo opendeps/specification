@@ -42,6 +42,18 @@ paths:
                       { "name": "Food bowl", "price": 3.99 },
                       { "name": "Brush", "price": 2.99 }
                     ]
+  /healthz:
+    get:
+      responses:
+        '200':
+          description: Healthcheck endpoint
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                success:
+                  value: "ok"
 
 components:
   securitySchemes:

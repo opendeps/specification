@@ -37,7 +37,7 @@ Some things to note about this example:
 
 > See [a more complete example](./docs/detailed-example.md) for more details about use and options.
 
-## How is this different from npm/Maven/Gradle/godep etc.?
+## How is this different from npm/Maven/Gradle/Go Modules etc.?
 
 OpenDeps is for expressing your _external runtime dependencies_, rather than things needed to build or package your application.
 

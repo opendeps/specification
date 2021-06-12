@@ -43,7 +43,7 @@ dependencies:
     version: "1.0.0"
     # This block controls how we probe to see if the service is up.
     availability:
-      url: https://example.com/pet-names/healthz
+      path: /healthz
       intervalSeconds: 10
       timeoutSeconds: 5
       attempts: 3
