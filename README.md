@@ -85,44 +85,9 @@ This is possible because tools verify dependency availability using the `availab
 
 ### Availability probe configuration
 
-You can customise the values used to check for availability, or use the defaults:
+You can customise the values used to check for availability, or use the defaults. If your availability endpoint requires it, you can customise the security configuration.
 
-```yaml
-availability:
-  # This is the endpoint to probe.
-  url: https://example.com/orders/healthz
-  # Check every 10 seconds, trying 3 times and waiting 5 seconds each time
-  intervalSeconds: 10
-  timeoutSeconds: 5
-  attempts: 3
-```
-
-### Availability probe security
-
-If your availability endpoint requires it, you can customise the security configuration:
-
-```yaml
-availability:
-  url: https://example.com/orders/healthz
-  security: basicAuth
-```
-
-The security configurations are defined in the `components.securityConfigs` block:
-
-```yaml
-components:
-  securityConfigs:
-    basicAuth:
-      type: authHeader
-      scheme: basic
-```
-
-> This example describes the following HTTP request header:
-> ```Authorization: Basic <base64 encoded username:password>```
-
-Other supported security configurations include Bearer token and custom HTTP headers.
-
-Secrets or tokens are not stored within an OpenDeps file - these are provided by the tooling.
+> Learn more about [availability probes](./docs/availability-probe.md).
 
 ---
 
@@ -140,25 +105,25 @@ See the `examples` directory for sample OpenDeps files, including:
 ### Documentation
 
 - [Detailed example](./docs/detailed-example.md)
+- [Availability probes](./docs/availability-probe.md)
+- [Self-hosting OpenDeps files](./docs/self-hosting.md)
 - [Metadata](./docs/metadata.md)
 
 ---
 
-## Self-hosting OpenDeps files in your app
+## The OpenDeps CLI
 
-In trusted environments, you may wish to serve your OpenDeps manifest from your application.
+The OpenDeps command line tool provides the following features:
 
-**Important:** You should consider who should have access to the information in your OpenDeps manifest, as it may contain sensitive data about your application.
+* Start live mocks of dependencies
+* Test the availability of dependencies
+* Validate OpenDeps files against this specification
 
-By convention, you host your application's OpenDeps file at the following path:
+It's open source and available cross-platform.
 
-    /.well-known/opendeps/manifest.yaml
+> [Get the OpenDeps CLI](https://github.com/opendeps/cli) for your system.
 
-For example:
-
-    https://example.com/.well-known/opendeps/manifest.yaml
-
-Tools use this well known path to obtain the OpenDeps file for your app, enabling automation of operations tasks such as monitoring.
+---
 
 ## Contributing
 

@@ -43,3 +43,9 @@ paths:
               examples:
                 success:
                   value: "ok"
+
+servers:
+  - description: Local development
+    url: http://localhost:8080
+  - description: Staging
+    url: https://example.com/names
