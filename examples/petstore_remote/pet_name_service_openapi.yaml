@@ -4,19 +4,17 @@
 openapi: "3.0.1"
 
 info:
-  title: Sample Petstore order service
-  description: This is a sample OpenAPI specification describing a service for ordering pet supplies.
+  title: Sample Petstore pet naming service
+  description: This is a sample OpenAPI specification describing a service for suggesting pet names.
   contact:
     name: Pete Cornish
     url: https://github.com/opendeps
     email: opendeps@example.com
-  version: "1.0.0"
+  version: "2.0.0"
 
 paths:
-  /supplies:
+  /names:
     get:
-      security:
-        - BasicAuth: []
       responses:
         '200':
           description: Lists supplies for sale
@@ -25,22 +23,13 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  required:
-                    - name
-                    - price
-                  properties:
-                      name:
-                        type: string
-                      price:
-                        type: number
-                        format: double
+                  type: string
               examples:
-                itemsExample:
+                namesExample:
                   value:
                     [
-                      { "name": "Food bowl", "price": 3.99 },
-                      { "name": "Brush", "price": 2.99 }
+                      "Fluffy",
+                      "Paws"
                     ]
   /healthz:
     get:
@@ -55,12 +44,8 @@ paths:
                 success:
                   value: "ok"
 
-components:
-  securitySchemes:
-    BasicAuth:
-      type: http
-      scheme: basic
-
 servers:
   - description: Local development
     url: http://localhost:8080
+  - description: Staging
+    url: https://example.com/names

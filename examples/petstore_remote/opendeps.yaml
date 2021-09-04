@@ -2,7 +2,7 @@ opendeps: "0.1.0"
 
 info:
   title: Sample Petstore app
-  description: Declares the dependencies of an example Petstore app.
+  description: Declares the dependencies of an example Petstore app, with remote specification files and servers.
   contact:
     name: Pete Cornish
     url: https://github.com/opendeps
@@ -10,7 +10,7 @@ info:
   version: "1.0.1"
 
   # the URL to this file
-  manifest: https://raw.githubusercontent.com/opendeps/specification/main/examples/petstore/opendeps.yaml
+  manifest: https://raw.githubusercontent.com/opendeps/specification/main/examples/petstore_remote/opendeps.yaml
 
 dependencies:
   # We depend on version 2.0.0 of the order service.
@@ -20,14 +20,14 @@ dependencies:
     summary: The order service.
     description: The service allows ordering of pet supplies from the store.
     # The OpenAPI specification for the order service.
-    spec: ./order_service_openapi.yaml
+    spec: https://raw.githubusercontent.com/opendeps/specification/main/examples/petstore_remote/order_service_openapi.yaml
     # This version must be deployed for our app to work.
     version: "2.0.0"
     # It's a required dependency at runtime.
     required: true
     # How to probe order service availability.
     availability:
-      path: /healthz
+      url: https://example.com/orders/healthz
       security: basicAuth
 
   # We also use the pet name service, but it is not essential,
@@ -39,7 +39,7 @@ dependencies:
     summary: The pet names service.
     description: The service generates pet names.
     # Our OpenAPI spec is relative to the OpenDeps file.
-    spec: ./pet_name_service_openapi.yaml
+    spec: https://raw.githubusercontent.com/opendeps/specification/main/examples/petstore_remote/pet_name_service_openapi.yaml
     version: "1.0.0"
     # This block controls how we probe to see if the service is up.
     availability:

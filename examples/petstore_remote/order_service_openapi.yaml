@@ -64,3 +64,5 @@ components:
 servers:
   - description: Local development
     url: http://localhost:8080
+  - description: Staging
+    url: https://example.com/orders
